@@ -30,6 +30,7 @@ import {
   WidgetUser,
 } from './voting'
 import { Avatar, Button, Spacer, VotingResultScreen } from './votingWidget'
+import { UiState, defaultUiState } from './uiState'
 
 const { widget } = figma
 const {
@@ -39,6 +40,7 @@ const {
   Text,
   Rectangle,
   Image,
+  Input,
   SVG,
   Ellipse,
 
@@ -67,27 +69,7 @@ const emotionalTexts = [
   'Sweet decision making, worker.',
 ]
 
-type UiState =
-  | {
-      votingState: 'NotStarted'
-    }
-  | {
-      votingState: 'InProgress'
-      votingOptions: VotingOptions
-      storyName: string
-      storyDescription: string
-      activeWidgetUsers: WidgetUser[]
-    }
-  | {
-      votingState: 'Revealed'
-      votingOptions: VotingOptions
-      storyName: string
-      storyDescription: string
-    }
 
-const defaultUiState: UiState = {
-  votingState: 'NotStarted',
-}
 
 function Scrumalot() {
   const [uiState, setUiState] = useSyncedState<UiState>('votingState', defaultUiState)
@@ -273,6 +255,11 @@ function VoteInProgress({
   votedUserIds,
   onClickVote,
 }: VoteInProgressScreenProps) {
+  const [uiState, setUiState] = useSyncedState<UiState>('votingState', defaultUiState)
+  const setStoryName = (e:string) => {
+    setUiState({ ...uiState, storyName: e })
+  }
+
   type UserWithAvatar = {
     photoUrl: string
     hasVoted: boolean
@@ -292,9 +279,14 @@ function VoteInProgress({
 
   return (
     <AutoLayout direction='vertical' width='fill-parent'>
-      <Text fontSize={14} fontWeight={500} fill='#101828'>
-        {storyName}
-      </Text>
+        <Input value={storyName}
+          fill='#101828'
+          fontSize={14}
+            onTextEditEnd={(e) => {
+            setStoryName(e.characters);
+          }}
+          placeholder="No Title" />
+
       <Spacer size={4} />
       <Text fontSize={12} fontWeight={400} fill='#101828'>
         {storyDescription}

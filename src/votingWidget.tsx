@@ -51,7 +51,8 @@ const {
   Image,
   SVG,
   Ellipse,
-
+  Input,
+  
   // Hooks
   useSyncedState,
   useSyncedMap,
@@ -64,6 +65,8 @@ const {
   waitForTask,
 } = widget
 
+import { UiState, defaultUiState } from './uiState'
+
 export type VotingResultProps = {
   votingOptions: VotingOptions
   storyName: string
@@ -72,11 +75,19 @@ export type VotingResultProps = {
 }
 
 export function VotingResultScreen({ votingOptions, storyName, storyDescription, votings }: VotingResultProps) {
+  const [uiState, setUiState] = useSyncedState<UiState>('votingState', defaultUiState)
+
+  const setStoryName = (e:string) => {
+    setUiState({ ...uiState, storyName: e })
+  }
+
   return (
     <AutoLayout direction='vertical' width='fill-parent'>
-      <Text fontSize={14} fontWeight={500} fill='#101828'>
-        {storyName}
-      </Text>
+      <Input value={storyName}
+        onTextEditEnd={(e) => {
+          setStoryName(e.characters);
+        }}
+        placeholder="No Title" />
       <Spacer size={4} />
       <Text fontSize={12} fontWeight={400} fill='#101828'>
         {storyDescription}

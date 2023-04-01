@@ -101,9 +101,14 @@ function InitVotePlugin() {
 
 function VotePlugin({ votingOptions, storyName, storyDescription, votedFor }: VotingData) {
   const [vote, setVote] = useState(votedFor ? votingOptions.options.indexOf(votedFor) : -1)
+  const [hours, setHours] = useState("");
   const handleOnSubmit = useCallback(() => {
-    emit<SetVoteEvent>('SET_VOTE', votingOptions.options[vote])
-  }, [votingOptions, vote])
+    if (hours != "") {
+      emit<SetVoteEvent>('SET_VOTE', votingOptions.options[vote] + " Points, " + hours + " Hours" )
+    } else {
+      emit<SetVoteEvent>('SET_VOTE', hours)
+    }
+  }, [votingOptions, vote, hours])
   return (
     <Box fitParent={true}>
       <Column padding={{ all: '16px' }} alignment='fill'>
@@ -114,6 +119,13 @@ function VotePlugin({ votingOptions, storyName, storyDescription, votedFor }: Vo
         <Divider />
         <Space size='16px' />
         <Column spacedBy='8px' alignment='fill'>
+          <Input
+            value={hours}
+            onValueChange={setHours}
+            outlined={true}
+            placeholder='Type number of hours'
+            alignment='fill'
+          />
           {votingOptions.options.map((opt, index) => {
             return (
               <SCRadioInput
@@ -128,7 +140,7 @@ function VotePlugin({ votingOptions, storyName, storyDescription, votedFor }: Vo
           })}
         </Column>
         <Space size='24px' fillGap={true} />
-        <Button alignment='fill' onClick={handleOnSubmit} enabled={vote != -1}>
+        <Button alignment='fill' onClick={handleOnSubmit} enabled={vote != -1 || hours != ""}>
           Submit
         </Button>
       </Column>
